@@ -3,6 +3,9 @@ package com.bridgelabz.employeepayrollapp.service;
 import com.bridgelabz.employeepayrollapp.dto.EmployeeDTO;
 import com.bridgelabz.employeepayrollapp.model.Employee;
 import com.bridgelabz.employeepayrollapp.repository.EmployeeRepository;
+import com.bridgelabz.employeepayrollapp.validation.EmployeeNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +13,10 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 public class EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
+   /* private final EmployeeRepository employeeRepository;
 
     public EmployeeService(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
@@ -64,5 +68,34 @@ public class EmployeeService {
     // Delete Employee
     public void deleteEmployeeDTO(Long id) {
         employeeRepository.deleteById(id);
+    }*/
+   @Autowired
+   private EmployeeRepository repository;
+
+    public List<Employee> getAllEmployees() {
+        return repository.findAll();
+    }
+    public Employee getEmployeeById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+    public Employee saveEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee(employeeDTO.getName(), employeeDTO.getSalary());
+        return repository.save(employee);
+    }
+
+    public Employee updateEmployee(Long id, EmployeeDTO employeeDTO) {
+        Employee existingEmployee = repository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with ID: " + id));
+
+        existingEmployee.setName(employeeDTO.getName());
+        existingEmployee.setSalary(employeeDTO.getSalary());
+        return repository.save(existingEmployee);
+    }
+
+    public void deleteEmployee(Long id) {
+        if (!repository.existsById(id)) {
+            throw new EmployeeNotFoundException("Employee not found with ID: " + id);
+        }
+        repository.deleteById(id);
     }
 }
