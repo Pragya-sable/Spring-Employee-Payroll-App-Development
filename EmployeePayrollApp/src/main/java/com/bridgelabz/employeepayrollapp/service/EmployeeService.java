@@ -8,6 +8,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -70,7 +72,9 @@ public class EmployeeService {
    @Autowired
    private EmployeeRepository repository;
 
-    public List<Employee> getAllEmployees() { return repository.findAll(); }
+   public List<Employee> employeeList = new ArrayList<>();
+
+   public List<Employee> getAllEmployees() { return repository.findAll(); }
     public Employee getEmployeeById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with ID: " + id));
